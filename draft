@@ -1,0 +1,10 @@
+        db_name = request.form['db_name']
+        usr = request.form['usr']
+        psw = request.form['psw']
+        if request.form['host'] == "":
+            host = "localhost"
+        else:
+            host = request.form['host']
+
+        try:
+            conn = psycopg2.connect("dbname='" + db_name + "' user='" + usr + "' host='" + host + "' password='" + psw + "'")

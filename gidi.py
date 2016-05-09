@@ -4,38 +4,49 @@
 
 import psycopg2
 import sys
+import pprint
 
 from flask import Flask, request, session, g, redirect, url_for, abort, \
-     render_template, flash
-
+    render_template, flash
 
 # create our little application :)
 app = Flask(__name__)
 app.config.from_object(__name__)
-
 
 @app.route('/')
 def home():
     param = "Hello"
     return render_template('home.html', parameters=param)
 
-@app.route('/db_show/<db_name>/')
-def db_show(db_name):
-    try:
-        conn = psycopg2.connect("dbname='" + db_name + "' user='postgres' host='localhost' password='admin'")
-    except:
-        return render_template('db_show_error.html', db_name=db_name)
+@app.route('/db_connect/', methods=['GET', 'POST'])
+def db_connect():
+    conn = None
+    if request.method == 'POST':
+#        db_name = request.form['db_name']
+#        usr = request.form['usr']
+#        psw = request.form['psw']
+#        if request.form['host'] == "":
+#            host = "localhost"
+#        else:
+#            host = request.form['host']
 
-    cur = conn.cursor()
-    cur.execute("SELECT " + db_name + " from pg_database")
-    rows = cur.fetchall()
+        try:
+            conn = psycopg2.connect("dbname='PPD_diseases' user='postgres' host='localhost' password='root'")
+        except:
 
-    print "\nShow me the databases:\n"
-    for row in rows:
-        print "   ", row[0]
+            return redirect(url_for('db_error'))
 
+        return redirect(url_for('db_show'))
 
-    return render_template('db_show.html', db_name=db_name, db_show=rows)
+    return render_template("db_connect.html")
+
+@app.route('/db_error')
+def db_error():
+    return render_template("db_error.html")
+
+@app.route('/db_show')
+def db_show():
+    return render_template('db_show.html')
 
 if __name__ == '__main__':
     app.run()

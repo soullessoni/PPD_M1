@@ -1,0 +1,15 @@
+<!doctype html>
+<title>GIDI</title>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+<div class=page>
+  <h1>GIDI</h1>
+  <div>
+    {% if not session.CONNEXION %}
+    <a href="{{ url_for('db_connect') }}">log in</a>
+    {% else %}
+    <a href="{{ url_for('db_disconnect') }}">log out</a>
+    {% endif %}
+  </div>
+
+  {% block body %}{% endblock %}
+</div>
