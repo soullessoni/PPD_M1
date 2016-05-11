@@ -27,6 +27,10 @@ def home():
     session.clear()
     return render_template('layout.html')
 
+@app.route('/db_disconnect')
+def db_disconnect():
+    return redirect(url_for('home'))
+
 @app.route('/db_connect/', methods=['GET', 'POST'])
 def db_connect():
     if not session.get('connexion'):

@@ -4,7 +4,7 @@
 <div class=page>
   <h1>GIDI</h1>
   <div>
-    {% if not session.CONNEXION %}
+    {% if not session.connexion %}
     <a href="{{ url_for('db_connect') }}">log in</a>
     {% else %}
     <a href="{{ url_for('db_disconnect') }}">log out</a>
