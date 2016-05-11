@@ -13,40 +13,101 @@ from flask import Flask, request, session, g, redirect, url_for, abort, \
 app = Flask(__name__)
 app.config.from_object(__name__)
 
+#File with disease's name
+fmaladie_name = "maladies_bovines.txt"
+
+def connect():
+    return psycopg2.connect("dbname='"+ session['db_name'] +
+                            "' user='"+ session['user'] +
+                            "' host='" + session['host'] +
+                            "' password='" + session['password'] + "'")
+
 @app.route('/')
 def home():
-    param = "Hello"
-    return render_template('home.html', parameters=param)
+    session.clear()
+    return render_template('layout.html')
 
 @app.route('/db_connect/', methods=['GET', 'POST'])
 def db_connect():
-    conn = None
-    if request.method == 'POST':
-#        db_name = request.form['db_name']
-#        usr = request.form['usr']
-#        psw = request.form['psw']
-#        if request.form['host'] == "":
-#            host = "localhost"
-#        else:
-#            host = request.form['host']
+    if not session.get('connexion'):
+        if request.method == 'POST':
+            db_name = request.form['db_name']
+            usr = request.form['usr']
+            psw = request.form['psw']
+            #Localhost is default
+            if request.form['host'] == "":
+                host = "localhost"
+            else:
+                host = request.form['host']
 
-        try:
-            conn = psycopg2.connect("dbname='PPD_diseases' user='postgres' host='localhost' password='root'")
-        except:
+            try:
+                conn = psycopg2.connect("dbname='"+db_name+"' user='"+usr+"' host='"+host+"' password='"+psw+"'")
+                conn.close()
 
-            return redirect(url_for('db_error'))
+            except:
+                return redirect(url_for('error'))
 
+            #set session data
+            session['db_name'] = db_name
+            session['user'] = usr
+            session['password'] = psw
+            session['host'] = host
+            session['connexion'] = True
+            return redirect(url_for('db_show'))
+
+    else:
         return redirect(url_for('db_show'))
 
     return render_template("db_connect.html")
 
-@app.route('/db_error')
-def db_error():
+@app.route('/error')
+def error():
     return render_template("db_error.html")
 
 @app.route('/db_show')
 def db_show():
-    return render_template('db_show.html')
+    if session.get('connexion'):
+        conn = connect()
+        #DO THINGS
+        param = "parameters to display"
+        conn.close()
+        return render_template('db_show.html', param=param)
+    else:
+        print 'pas cool'
+        return redirect(url_for('error'))
+
+@app.route('/index_generator/local')
+def index_local_generator():
+    if session.get('connexion'):
+        conn = session['connexion']
+        cur1 = conn.cursor()
+        cur2 = conn.cursor()
+
+        cur1.execute(
+                     'SELECT table_name '
+                     'FROM INFORMATION_SCHEMA.TABLES '
+                     'WHERE table_name LIKE "farm%";')
+
+        with open(fmaladie_name) as f:
+            maladies = (f.readlines())
+
+        tables = cur1.fetchall()
+        for table in tables:
+            for maladie in maladies:
+                cur2.execute(
+                    #table -> nom  maladie -> nom
+                    "CREATE TABLE " + table + "_" + maladie + " "
+                    "   (id integer PRIMARY KEY, proba numeric(10,8), "
+                    "INSERT INTO " + table + "_" + maladie + " (id, proba) "
+                    "SELECT id, proba "
+                    "FROM " + table + " "
+                    "WHERE maladie = '" + maladie + "';")
+        print "Index locaux créés"
+        conn.commit()
+    else:
+        return redirect(url_for('error'))
+
+app.secret_key = '6Mb0JgsZ4HLJpnbSjNiZuTwaSA7RwV3Inf6DUmnu'
 
 if __name__ == '__main__':
     app.run()
