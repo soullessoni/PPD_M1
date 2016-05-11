@@ -73,7 +73,6 @@ def db_show():
         conn.close()
         return render_template('db_show.html', param=param)
     else:
-        print 'pas cool'
         return redirect(url_for('error'))
 
 @app.route('/index_generator/local')
@@ -102,7 +101,6 @@ def index_local_generator():
                     "SELECT id, proba "
                     "FROM " + table + " "
                     "WHERE maladie = '" + maladie + "';")
-        print "Index locaux créés"
         conn.commit()
     else:
         return redirect(url_for('error'))
