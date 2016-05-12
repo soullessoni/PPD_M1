@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block body %}
+<form action="{{ url_for('db_action') }}" method=post>
+    <input type="radio" name="action" value="top_K" checked> Top K<br>
+    <input type="radio" name="action" value="threshold"> Threshold<br>
+    <input type="radio" name="action" value="index_local"> Creation d'index local<br>
+    <input type="radio" name="action" value="index_global"> Creation d'index global<br>
+    <input type="radio" name="action" value="index_local"> Creation d'index local<br>
+    <input type="radio" name="action" value="db_link"> Creation d'un lien à une nouvelle base<br>
+
+    <input type=submit value="Go !">
+</form>
+
+{% endblock %}

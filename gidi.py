@@ -3,6 +3,7 @@
 """
 
 import psycopg2
+from switch import Switch
 import sys
 import pprint
 
@@ -57,10 +58,10 @@ def db_connect():
             session['password'] = psw
             session['host'] = host
             session['connexion'] = True
-            return redirect(url_for('db_show'))
+            return redirect(url_for('db_action'))
 
     else:
-        return redirect(url_for('db_show'))
+        return redirect(url_for('db_action'))
 
     return render_template("db_connect.html")
 
@@ -68,14 +69,19 @@ def db_connect():
 def error():
     return render_template("db_error.html")
 
-@app.route('/db_show')
-def db_show():
+@app.route('/db_action')
+def db_action():
     if session.get('connexion'):
-        conn = connect()
-        #DO THINGS
-        param = "parameters to display"
-        conn.close()
-        return render_template('db_show.html', param=param)
+        if request.method == 'POST':
+            print "which action ?"
+            with Switch(val) as case:
+                if case(1):
+                    values.append('Found 1')
+
+                if case(2, 3):
+                    values.append('Found 2 or 3')
+        else:
+            return render_template('db_action.html')
     else:
         return redirect(url_for('error'))
 
@@ -94,17 +100,24 @@ def index_local_generator():
         with open(fmaladie_name) as f:
             maladies = (f.readlines())
 
+
         tables = cur1.fetchall()
+
         for table in tables:
             for maladie in maladies:
+                print str(maladie)
                 cur2.execute(
                     #table -> nom  maladie -> nom
-                    "CREATE TABLE " + table + "_" + maladie + " "
-                    "   (id integer PRIMARY KEY, proba numeric(10,8), "
-                    "INSERT INTO " + table + "_" + maladie + " (id, proba) "
-                    "SELECT id, proba "
-                    "FROM " + table + " "
-                    "WHERE maladie = '" + maladie + "';")
+                    'CREATE TABLE "' + table[0] + '_' + str(maladie).rstrip() + '" '
+                    '(id INTEGER PRIMARY KEY, proba NUMERIC(10,8)); '
+                    'INSERT INTO "' + table[0] + '_' + str(maladie).rstrip() + '" '
+                    'SELECT id, proba '
+                    'FROM "' + table[0] + '" '
+                    'WHERE "maladie" '
+                    "= '"+(str(maladie).rstrip())+"' "
+                    ';'
+                )
+
         conn.commit()
     else:
         return redirect(url_for('error'))
