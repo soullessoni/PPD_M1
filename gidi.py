@@ -65,49 +65,50 @@ def db_connect():
 
     return render_template("db_connect.html")
 
-@app.route('/error')
-def error():
-    return render_template("db_error.html")
-
-@app.route('/db_action')
+@app.route('/db_action', methods=['GET', 'POST'])
 def db_action():
     if session.get('connexion'):
         if request.method == 'POST':
             print "which action ?"
-            with Switch(val) as case:
-                if case(1):
-                    values.append('Found 1')
-
-                if case(2, 3):
-                    values.append('Found 2 or 3')
+            with Switch(request.form['action']) as case:
+                if case("top_K"):
+                    return redirect(url_for("top_k"))
+                if case("threshold"):
+                    return redirect(url_for("threshold"))
+                if case("index_local"):
+                    return redirect(url_for("index_local"))
+                if case("index_global"):
+                    return redirect(url_for("index_global"))
+                if case("db_link"):
+                    return redirect(url_for("db_link"))
+                if case.default:
+                    return redirect(url_for('error'))
         else:
             return render_template('db_action.html')
     else:
         return redirect(url_for('error'))
 
-@app.route('/index_generator/local')
-def index_local_generator():
+@app.route('/index/local')
+def index_local():
     if session.get('connexion'):
         conn = session['connexion']
         cur1 = conn.cursor()
         cur2 = conn.cursor()
 
         cur1.execute(
-                     'SELECT table_name '
-                     'FROM INFORMATION_SCHEMA.TABLES '
-                     'WHERE table_name LIKE "farm%";')
+            'SELECT table_name '
+            'FROM INFORMATION_SCHEMA.TABLES '
+            'WHERE table_name LIKE "farm%";'
+        )
 
         with open(fmaladie_name) as f:
             maladies = (f.readlines())
 
-
         tables = cur1.fetchall()
-
         for table in tables:
             for maladie in maladies:
                 print str(maladie)
                 cur2.execute(
-                    #table -> nom  maladie -> nom
                     'CREATE TABLE "' + table[0] + '_' + str(maladie).rstrip() + '" '
                     '(id INTEGER PRIMARY KEY, proba NUMERIC(10,8)); '
                     'INSERT INTO "' + table[0] + '_' + str(maladie).rstrip() + '" '
@@ -117,10 +118,31 @@ def index_local_generator():
                     "= '"+(str(maladie).rstrip())+"' "
                     ';'
                 )
-
         conn.commit()
+        flash("All index are belong to us !")
+        return redirect(url_for('db_action'))
     else:
         return redirect(url_for('error'))
+
+@app.route('/index/global')
+def index_global():
+    return redirect(url_for('db_action'))
+
+@app.route('/top_k')
+def top_k():
+    return render_template('top_k.html')
+
+@app.route('/threshold')
+def threshold():
+    return render_template('threshold.html')
+
+@app.route('/db_link')
+def db_link():
+    return render_template('db_link.html')
+
+@app.route('/error')
+def error():
+    return render_template("db_error.html")
 
 app.secret_key = '6Mb0JgsZ4HLJpnbSjNiZuTwaSA7RwV3Inf6DUmnu'
 
