@@ -23,6 +23,26 @@ def connect():
                             "' host='" + session['host'] +
                             "' password='" + session['password'] + "'")
 
+def drop_index():
+        conn = connect()
+        cur1 = conn.cursor()
+        cur2 = conn.cursor()
+        cur1.execute(
+            'SELECT table_name '
+            'FROM INFORMATION_SCHEMA.TABLES '
+            'WHERE table_name LIKE \'farm%\';'
+        )
+        tables = cur1.fetchall()
+        for table in tables:
+            if ('farm1' == table[0]):
+                pass
+            else:
+                cur2.execute(
+                    'drop table "' + table[0] + '";'
+                    )
+        conn.commit()
+
+
 @app.route('/')
 def home():
     session.clear()
@@ -69,7 +89,6 @@ def db_connect():
 def db_action():
     if session.get('connexion'):
         if request.method == 'POST':
-            print "which action ?"
             with Switch(request.form['action']) as case:
                 if case("top_K"):
                     return redirect(url_for("top_k"))
@@ -91,35 +110,39 @@ def db_action():
 @app.route('/index/local')
 def index_local():
     if session.get('connexion'):
-        conn = session['connexion']
+        drop_index()
+
+        conn = connect()
         cur1 = conn.cursor()
         cur2 = conn.cursor()
-
-        cur1.execute(
-            'SELECT table_name '
-            'FROM INFORMATION_SCHEMA.TABLES '
-            'WHERE table_name LIKE "farm%";'
-        )
 
         with open(fmaladie_name) as f:
             maladies = (f.readlines())
 
+        cur1.execute(
+            'SELECT table_name '
+            'FROM INFORMATION_SCHEMA.TABLES '
+            'WHERE table_name LIKE \'farm%\';'
+        )
         tables = cur1.fetchall()
+
         for table in tables:
             for maladie in maladies:
-                print str(maladie)
                 cur2.execute(
                     'CREATE TABLE "' + table[0] + '_' + str(maladie).rstrip() + '" '
                     '(id INTEGER PRIMARY KEY, proba NUMERIC(10,8)); '
                     'INSERT INTO "' + table[0] + '_' + str(maladie).rstrip() + '" '
                     'SELECT id, proba '
                     'FROM "' + table[0] + '" '
-                    'WHERE "maladie" '
-                    "= '"+(str(maladie).rstrip())+"' "
-                    ';'
+                    'WHERE "maladie" '"= '" + (str(maladie).rstrip()) + "' "';'
+
+                    'CREATE TABLE "test" (like "' + table[0] + '_' + str(maladie).rstrip() + '"); '
+                    'INSERT INTO "test" '
+                    'SELECT * FROM "' + table[0] + '_' + str(maladie).rstrip() + '" ORDER BY proba DESC; '
+                    'DROP TABLE "' + table[0] + '_' + str(maladie).rstrip() + '"; '
+                    'ALTER TABLE "test" RENAME TO "' + table[0] + '_' + str(maladie).rstrip() + '";'
                 )
         conn.commit()
-        flash("All index are belong to us !")
         return redirect(url_for('db_action'))
     else:
         return redirect(url_for('error'))
