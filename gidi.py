@@ -4,6 +4,7 @@
 
 import psycopg2
 from switch import Switch
+import re
 import sys
 import pprint
 
@@ -23,7 +24,7 @@ def connect():
                             "' host='" + session['host'] +
                             "' password='" + session['password'] + "'")
 
-def drop_index():
+def drop_index_local():
         conn = connect()
         cur1 = conn.cursor()
         cur2 = conn.cursor()
@@ -33,9 +34,12 @@ def drop_index():
             'WHERE table_name LIKE \'farm%\';'
         )
         tables = cur1.fetchall()
+        #Please a good RegEx
         for table in tables:
-            if ('farm1' == table[0]):
-                pass
+            print table[0]
+            is_farm = re.compile('\\bfarm[0-9]+\\b', re.IGNORECASE)
+            if (is_farm.match(table[0]) != None):
+                print table[0]
             else:
                 cur2.execute(
                     'drop table "' + table[0] + '";'
@@ -110,7 +114,7 @@ def db_action():
 @app.route('/index/local')
 def index_local():
     if session.get('connexion'):
-        drop_index()
+        drop_index_local()
 
         conn = connect()
         cur1 = conn.cursor()
