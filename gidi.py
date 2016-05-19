@@ -6,7 +6,6 @@ import psycopg2
 from switch import Switch
 import re
 import sys
-import pprint
 
 from flask import Flask, request, session, g, redirect, url_for, abort, \
     render_template, flash
@@ -36,16 +35,14 @@ def drop_index_local():
         tables = cur1.fetchall()
         #Please a good RegEx
         for table in tables:
-            print table[0]
             is_farm = re.compile('\\bfarm[0-9]+\\b', re.IGNORECASE)
             if (is_farm.match(table[0]) != None):
-                print table[0]
+                pass
             else:
                 cur2.execute(
                     'drop table "' + table[0] + '";'
                     )
         conn.commit()
-
 
 @app.route('/')
 def home():
@@ -93,9 +90,12 @@ def db_connect():
 def db_action():
     if session.get('connexion'):
         if request.method == 'POST':
+            with open(fmaladie_name) as f:
+                maladies = (f.readlines())
+            print maladies
             with Switch(request.form['action']) as case:
                 if case("top_K"):
-                    return redirect(url_for("top_k"))
+                    return render_template("top_k.html", maladies=maladies)
                 if case("threshold"):
                     return redirect(url_for("threshold"))
                 if case("index_local"):
@@ -147,6 +147,7 @@ def index_local():
                     'ALTER TABLE "test" RENAME TO "' + table[0] + '_' + str(maladie).rstrip() + '";'
                 )
         conn.commit()
+        flash('Local index created !')
         return redirect(url_for('db_action'))
     else:
         return redirect(url_for('error'))

@@ -1,4 +1,12 @@
 {% extends "layout.html" %}
 {% block body %}
-     TOP K
+<form action="{{ url_for('top_k') }}" method=post>
+     Maladie : <SELECT name="maladie" size="1">
+        {% for maladie in maladies %}
+            <OPTION> {{ maladie }}
+        {% endfor %}
+    </SELECT> <br>
+    Top : <input type=text name=nb_max>
+    <input type=submit value="Top K">
+</form>
 {% endblock %}
