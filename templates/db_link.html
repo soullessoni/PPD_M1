@@ -1,4 +1,38 @@
 {% extends "layout.html" %}
 {% block body %}
-     DB LINK
+    <h2>db_connect</h2>
+  {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
+  <form action="{{ url_for('db_link') }}" method=post>
+    <dl>
+      <dt>Username:
+      <dd><input type=text name=usr1>
+      <dt>Password:
+      <dd><input type=password name=psw1>
+      <dt>Address IP :
+      <dd><input type=text name=host1>
+      <dt>DB Name:
+      <dd><input type=text name=db_name1>
+    </dl>
+    <dl>
+      <dt>Username:
+      <dd><input type=text name=usr2>
+      <dt>Password:
+      <dd><input type=password name=psw2>
+      <dt>Address IP :
+      <dd><input type=text name=host2>
+      <dt>DB Name:
+      <dd><input type=text name=db_name2>
+    </dl>
+    <dl>
+      <dt>Username:
+      <dd><input type=text name=usr3>
+      <dt>Password:
+      <dd><input type=password name=psw3>
+      <dt>Address IP :
+      <dd><input type=text name=host3>
+      <dt>DB Name:
+      <dd><input type=text name=db_name3>
+        <dd><input type=submit value=db_link>
+    </dl>
+  </form>
 {% endblock %}
