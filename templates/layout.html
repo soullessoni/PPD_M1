@@ -1,7 +1,6 @@
 <!doctype html>
 
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='bootstrap/css/bootstrap.css') }}">
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='bootstrap/css/jumbotron-narrow.css') }}">
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='bootstrap/css/GIDI.css') }}">
 
 <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.js') }}"> </script>
@@ -10,9 +9,9 @@
 <div class="container" role="main">
 
     <div class="jumbotron">
-        <h1 id="title">GIDI</h1>
+        <h1 id="title" class="center text-center" >Gestion et Indexation de Données Incertaines</h1>
             {% if not session.connexion %}
-                <a href="{{ url_for('db_connect') }}">
+                <a class="center" href="{{ url_for('db_connect') }}">
                     <button type="button" class="btn btn-lg btn-gidi" >
                         log in
                     </button>
