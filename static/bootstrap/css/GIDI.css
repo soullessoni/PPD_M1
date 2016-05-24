@@ -1,0 +1,70 @@
+.btn-gidi {
+  color: #fff;
+  background-color: #54a8b8;
+  border-color: #54a8b8;
+}
+.btn-gidi:focus,
+.btn-gidi.focus {
+  color: #fff;
+  background-color: #FFFFFF;
+  border-color: #FFFFFF;
+  color: #54a8b8;
+}
+.btn-gidi:hover {
+  color: #fff;
+  background-color: #FFFFFF;
+  border-color: #FFFFFF;
+  color: #54a8b8;
+}
+.btn-gidi:active,
+.btn-gidi.active,
+.open > .dropdown-toggle.btn-gidi {
+  color: #fff;
+  background-color: #54a8b8;
+  border-color: #54a8b8;
+}
+.btn-gidi:active:hover,
+.btn-gidi.active:hover,
+.open > .dropdown-toggle.btn-gidi:hover,
+.btn-gidi:active:focus,
+.btn-gidi.active:focus,
+.open > .dropdown-toggle.btn-gidi:focus,
+.btn-gidi:active.focus,
+.btn-gidi.active.focus,
+.open > .dropdown-toggle.btn-gidi.focus {
+  color: #fff;
+  background-color: #FFFFFF;
+  border-color: #FFFFFF;
+  color: #54a8b8;
+}
+.btn-gidi:active,
+.btn-gidi.active,
+.open > .dropdown-toggle.btn-gidi {
+  background-image: none;
+}
+.btn-gidi.disabled:hover,
+.btn-gidi[disabled]:hover,
+fieldset[disabled] .btn-gidi:hover,
+.btn-gidi.disabled:focus,
+.btn-gidi[disabled]:focus,
+fieldset[disabled] .btn-gidi:focus,
+.btn-gidi.disabled.focus,
+.btn-gidi[disabled].focus,
+fieldset[disabled] .btn-gidi.focus {
+  background-color: #FFFFFF;
+  border-color: #FFFFFF;
+  color: #54a8b8;
+}
+.btn-gidi .badge {
+  color: #FFFFFF;
+  background-color: #FFFFFF;
+  color: #54a8b8;
+}
+
+.jumbotron {
+    background-color: #A7DBD8;
+}
+
+#title {
+    color: #FFFFFF
+}

@@ -1,15 +1,33 @@
 <!doctype html>
-<title>GIDI</title>
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
-<div class=page>
-  <h1>GIDI</h1>
-  <div>
-    {% if not session.connexion %}
-    <a href="{{ url_for('db_connect') }}">log in</a>
-    {% else %}
-    <a href="{{ url_for('db_disconnect') }}">log out</a>
-    {% endif %}
-  </div>
 
-  {% block body %}{% endblock %}
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='bootstrap/css/bootstrap.css') }}">
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='bootstrap/css/jumbotron-narrow.css') }}">
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='bootstrap/css/GIDI.css') }}">
+
+<script src="{{ url_for('static', filename='bootstrap/js/bootstrap.js') }}"> </script>
+<title>GIDI</title>
+
+<div class="container" role="main">
+
+    <div class="jumbotron">
+        <h1 id="title">GIDI</h1>
+            {% if not session.connexion %}
+                <a href="{{ url_for('db_connect') }}">
+                    <button type="button" class="btn btn-lg btn-gidi" >
+                        log in
+                    </button>
+                </a>
+            {% else %}
+                <a href="{{ url_for('db_disconnect') }}">
+                    <button type="button" class="btn btn-lg btn-gidi" >
+                        log out
+                    </button>
+                </a>
+            {% endif %}
+
+    </div>
+
+    {% block container %}
+    {% endblock %}
+
 </div>
