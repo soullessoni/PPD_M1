@@ -38,7 +38,7 @@ fievreEphemere
 fievreMediterraneenne
 gale
 hemoglobinurieBacillaire
-ladrerieBœuf
+ladrerieBoeuf
 leptospiroseBovine
 leucoseBovine
 lymphadeniteCaseeuse
