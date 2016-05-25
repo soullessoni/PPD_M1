@@ -36,7 +36,6 @@ def drop_index_local():
         tables = cur1.fetchall()
         #Please a good RegEx
         for table in tables:
-            print table[0]
             is_farm = re.compile('\\bfarm[0-9]+\\b', re.IGNORECASE)
             if (is_farm.match(table[0]) != None):
                 print table[0]
