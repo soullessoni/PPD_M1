@@ -1,0 +1,12 @@
+{% extends "container.html" %}
+{% block body %}
+  <h2>Index global</h2>
+  {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
+  <form action="{{ url_for('index_global') }}" method=post>
+    <dl>
+      <dt>Maladie :
+      <dd><input type=text name=maladie>
+      <dd><input type=submit value=Creer>
+    </dl>
+  </form>
+{% endblock %}
