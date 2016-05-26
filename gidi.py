@@ -204,16 +204,12 @@ def index_global():
                 """
                 #Suppression de table_path à ajjouter si necessaire
                 #dblink
+                """
+                    select dblink_connect('"""+test+"""', 'host=localhost port=5432 dbname=PPD user=postgres password=admin');
+                    SELECT * FROM dblink('toto2','SELECT proba FROM farm1') AS t(c numeric) LIMIT 1;
+                """
 
-                '''
-                """
-                select dblink_connect('"""+test+"""', 'host=localhost port=5432 dbname=PPD user=postgres password=admin');
-                SELECT * FROM dblink('toto2','SELECT proba FROM farm1') AS t(c numeric) LIMIT 1;
-                """
-                '''
             )
-            test1 = cur4.fetchall()
-            print test1
             print 'okkkkkkkkkkkkkkk'
             conn.commit()
             return redirect(url_for('db_action'))
