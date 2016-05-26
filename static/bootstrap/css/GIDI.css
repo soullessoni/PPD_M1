@@ -61,10 +61,82 @@ fieldset[disabled] .btn-gidi.focus {
   color: #54a8b8;
 }
 
+.btn-connect {
+  color: #fff;
+  background-color: #54a8b8;
+  border-color: #54a8b8;
+}
+.btn-connect:focus,
+.btn-connect.focus {
+  color: #fff;
+  background-color: #A7DBD8;
+  border-color: #A7DBD8;
+  color: #54a8b8;
+}
+.btn-connect:hover {
+  color: #fff;
+  background-color: #A7DBD8;
+  border-color: #A7DBD8;
+  color: #54a8b8;
+}
+.btn-connect:active,
+.btn-connect.active,
+.open > .dropdown-toggle.btn-connect {
+  color: #fff;
+  background-color: #54a8b8;
+  border-color: #54a8b8;
+}
+.btn-connect:active:hover,
+.btn-connect.active:hover,
+.open > .dropdown-toggle.btn-connect:hover,
+.btn-connect:active:focus,
+.btn-connect.active:focus,
+.open > .dropdown-toggle.btn-connect:focus,
+.btn-connect:active.focus,
+.btn-connect.active.focus,
+.open > .dropdown-toggle.btn-connect.focus {
+  color: #fff;
+  background-color: #A7DBD8;
+  border-color: #A7DBD8;
+  color: #54a8b8;
+}
+.btn-connect:active,
+.btn-connect.active,
+.open > .dropdown-toggle.btn-connect {
+  background-image: none;
+}
+.btn-connect.disabled:hover,
+.btn-connect[disabled]:hover,
+fieldset[disabled] .btn-connect:hover,
+.btn-connect.disabled:focus,
+.btn-connect[disabled]:focus,
+fieldset[disabled] .btn-connect:focus,
+.btn-connect.disabled.focus,
+.btn-connect[disabled].focus,
+fieldset[disabled] .btn-connect.focus {
+  background-color: #A7DBD8;
+  border-color: #A7DBD8;
+  color: #54a8b8;
+}
+.btn-connect .badge {
+  color: #A7DBD8;
+  background-color: #A7DBD8;
+  color: #54a8b8;
+}
+
 .jumbotron {
     background-color: #A7DBD8;
 }
 
 #title {
     color: #FFFFFF;
+}
+
+#db_connect_form {
+    width: 40%;
+    float: center;
+}
+
+.center {
+    text-align: center;
 }

@@ -1,18 +1,25 @@
 {% extends "container.html" %}
 {% block body %}
-  <h2>Login</h2>
   {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
-  <form action="{{ url_for('db_connect') }}" method=post>
-    <dl>
-      <dt>Username:
-      <dd><input type=text name=usr>
-      <dt>Password:
-      <dd><input type=password name=psw>
-      <dt>Host (vide -> localhost) :
-      <dd><input type=text name=host>
-      <dt>DB:
-      <dd><input type=text name=db_name>
-<dd><input type=submit value=Login>
-    </dl>
-  </form>
+    <div class="container" id="db_connect_form">
+        <form class="form-signin center" action="{{ url_for('db_connect') }}" method=post>
+            <h2 class="form-signin-heading">Please sign in</h2>
+
+            <label for="usr" class="sr-only">Username</label>
+            <input type="text" id="usr" name="usr" class="form-control" placeholder="Username" required autofocus>
+
+            <label for="psw" class="sr-only">Password</label>
+            <input type="password" id="psw" name="psw" class="form-control" placeholder="Password" required>
+
+            <label for="host" class="sr-only">Host</label>
+            <input type="text" id="host" name="host" class="form-control" placeholder="Host">
+
+            <label for="db_name" class="sr-only">DataBase name</label>
+            <input type="text" id="db_name" name="db_name" class="form-control" placeholder="DB Name" required><br>
+
+            <button class="btn btn-lg btn-connect btn-block" type="submit">Connect</button>
+        </form>
+
+    </div>
+
 {% endblock %}
