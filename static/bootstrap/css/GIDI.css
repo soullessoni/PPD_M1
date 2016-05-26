@@ -128,15 +128,20 @@ fieldset[disabled] .btn-connect.focus {
     background-color: #A7DBD8;
 }
 
+.center {
+    text-align: center;
+}
+
 #title {
     color: #FFFFFF;
+    font-size: 3em;
+}
+
+#main {
+    margin-top: 2em
 }
 
 #db_connect_form {
     width: 40%;
     float: center;
-}
-
-.center {
-    text-align: center;
 }
