@@ -220,6 +220,29 @@ def index_global():
                       DROP TABLE index_global;
                       ALTER TABLE test RENAME TO index_global;
                     """
+                    """
+                        SELECT dblink_connect('toto5', 'hostaddr=192.168.43.143 port=5432 dbname=PPD user=postgres password=root');
+                        INSERT INTO index_global
+                        SELECT * FROM dblink('toto5','SELECT * FROM index_global') AS t(a text ,c numeric );
+                        CREATE TABLE test (LIKE index_global);
+                        INSERT INTO test
+                        SELECT * FROM index_global ORDER BY proba DESC;
+                        DROP TABLE index_global;
+                        ALTER TABLE test RENAME TO index_global;
+                      """
+                    """
+                        SELECT dblink_connect('toto6', 'hostaddr=192.168.43.108 port=5432 dbname=PPD2 user=postgres password=root');
+                        INSERT INTO index_global
+                        SELECT * FROM dblink('toto6','SELECT * FROM index_global') AS t(a text ,c numeric );
+                        CREATE TABLE test (LIKE index_global);
+                        INSERT INTO test
+                        SELECT * FROM index_global ORDER BY proba DESC;
+                        DROP TABLE index_global;
+                        ALTER TABLE test RENAME TO index_global;
+                        SELECT dblink_disconnect('toto4');
+                        SELECT dblink_disconnect('toto5');
+                        SELECT dblink_disconnect('toto6');
+                      """
                 )
             else:
                 print 'bip bip chui pas rentré'
