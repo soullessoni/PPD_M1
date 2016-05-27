@@ -164,6 +164,7 @@ def index_global():
                 "CREATE TABLE index_global(adress CHAR(100), proba NUMERIC(10,8));"
             )
             sick = request.form['maladie']
+            doOrNo = request.form['choice']
             print sick
             cur2.execute(
                 #creation de table_path et la remplir
@@ -193,7 +194,7 @@ def index_global():
                 )
                 i = i + 1
             print 'en haut pas touche'
-            test = 'toto2'
+            test = 'toto3'
             cur4.execute(
                 # mettre en ordre l'index global
                 """CREATE TABLE test (LIKE index_global);
@@ -203,13 +204,25 @@ def index_global():
                     ALTER TABLE test RENAME TO index_global;
                 """
                 #Suppression de table_path à ajjouter si necessaire
-                #dblink
-                """
-                    select dblink_connect('"""+test+"""', 'host=localhost port=5432 dbname=PPD user=postgres password=admin');
-                    SELECT * FROM dblink('toto2','SELECT proba FROM farm1') AS t(c numeric) LIMIT 1;
-                """
 
             )
+            print doOrNo + '==========================================='
+            if (doOrNo == '1'):
+                cur4.execute(
+                    # dblinK
+                    """
+                      SELECT dblink_connect('toto4', 'host=localhost port=5432 dbname=PPD1 user=postgres password=admin');
+                      INSERT INTO index_global
+                      SELECT * FROM dblink('toto4','SELECT * FROM index_global') AS t(a text ,c numeric );
+                      CREATE TABLE test (LIKE index_global);
+                      INSERT INTO test
+                      SELECT * FROM index_global ORDER BY proba DESC;
+                      DROP TABLE index_global;
+                      ALTER TABLE test RENAME TO index_global;
+                    """
+                )
+            else:
+                print 'bip bip chui pas rentré'
             print 'okkkkkkkkkkkkkkk'
             conn.commit()
             return redirect(url_for('db_action'))
