@@ -172,27 +172,41 @@ def index_global():
                 'CREATE TABLE table_path(adress CHAR(100));'
                 'insert into table_path (adress)'
                 'SELECT table_name FROM INFORMATION_SCHEMA.TABLES WHERE table_name LIKE \'%_' + sick + '\';'
+                """DROP TABLE IF EXISTS table_path_ip;
+                    CREATE TABLE table_path_ip(adress CHAR(100));"""
             )
+
+            print '++++++++++++++++++++++++++'
+            cur2.execute(
+                """SELECT adress FROM table_path"""
+            )
+            listeFarms = cur2.fetchall()
+            for farm in listeFarms:
+                print farm[0]
+                ipName = session['host'] + '.' + farm[0]
+                print ipName
+                cur2.execute(
+                    """
+                    INSERT INTO table_path_ip(adress) VALUES('""" + ipName + """')"""
+                )
+            print '++++++++++++++++++++++++++'
+
             cur3.execute(
                 #pour remplir la listeTablesSick en bas
                 'SELECT adress FROM table_path;'
             )
             listeTablesSick = cur3.fetchall()
             print listeTablesSick
-            i = 0
             for liste in listeTablesSick:
                 print '-----------------------'
                 print liste[0]
                 cur3.execute(
                     #remplir l'index global
-                    'INSERT INTO index_global(adress, proba)'
-                    'SELECT table_path.adress, "'+ liste[0].rstrip() +'".proba FROM table_path, "'+ liste[0].rstrip() +'" LIMIT 1;'
-                    'DELETE FROM table_path WHERE ctid IN (SELECT ctid FROM table_path LIMIT 1)'
-
-
-
+                    """INSERT INTO index_global(adress, proba)
+                    SELECT table_path_ip.adress, """+ liste[0].rstrip() +""".proba FROM table_path_ip, """+ liste[0].rstrip() +""" LIMIT 1;
+                    DELETE FROM table_path WHERE ctid IN (SELECT ctid FROM table_path LIMIT 1);
+                    DELETE FROM table_path_ip WHERE ctid IN (SELECT ctid FROM table_path_ip LIMIT 1)"""
                 )
-                i = i + 1
             print 'en haut pas touche'
             test = 'toto3'
             cur4.execute(
