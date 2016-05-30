@@ -145,3 +145,8 @@ fieldset[disabled] .btn-connect.focus {
     width: 40%;
     float: center;
 }
+
+#btn_connect,
+#btn_disconnect {
+    font-size: 21px;
+}

@@ -48,11 +48,11 @@ def drop_index_local():
 
 @app.route('/')
 def home():
-    session.clear()
-    return render_template('layout.html')
+    return render_template('home.html')
 
 @app.route('/db_disconnect')
 def db_disconnect():
+    session.clear()
     return redirect(url_for('home'))
 
 @app.route('/db_connect/', methods=['GET', 'POST'])
@@ -106,7 +106,7 @@ def db_action():
                 if case.default:
                     return redirect(url_for('error'))
         else:
-            return render_template('db_action.html')
+            return render_template('home.html')
     else:
         return redirect(url_for('error'))
 

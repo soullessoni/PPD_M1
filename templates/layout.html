@@ -11,31 +11,35 @@
     <nav class="navbar navbar-default">
         <div class="container-fluid">
 
-            <ul class="nav navbar-nav navbar-left">
-                <a class="navbar-brand">Gestion et Indexation des Données Incertaines</a>
-                {% if not session.connexion %}
-                {% else %}
-                    <ul class="nav navbar-nav">
-                        <li><a href="{{ url_for('top_K') }}">top_K</a></li>
-                        <li><a href="{{ url_for('top_K') }}"> Top K<br> </a></li>li>
-                        <li><a href="{{ url_for('threshold') }}"> Threshold </a></li>li>
-                        <li><a href="{{ url_for('index_local') }}"> Creation d'index local </a></li>li>
-                        <li><a href="{{ url_for('index_global') }}"> Creation d'index global </a></li>li>
-                        <li><a href="{{ url_for('db_link') }}"> Creation d'un lien à une nouvelle base </a></li>li>
-                    </ul>
-                {% endif %}
-            </ul>
+
+            {% if not session.connexion %}
+                <ul class="nav navbar-nav navbar-left">
+                    <a class="navbar-brand" href="{{ url_for('home') }}">Gestion et Indexation des Données Incertaines</a>
+                </ul>
+            {% else %}
+                <ul class="nav navbar-nav navbar-left">
+                    <a class="navbar-brand" href="{{ url_for('home') }}">GIDI</a>
+                </ul>
+                <ul class="nav navbar-nav">
+                    <li><a href="{{ url_for('top_k') }}"> Top K </a></li>
+                    <li><a href="{{ url_for('threshold') }}"> Threshold </a></li>
+                    <li><a href="{{ url_for('index_local') }}"> Creation d'index local </a></li>
+                    <li><a href="{{ url_for('index_global') }}"> Creation d'index global </a></li>
+                    <li><a href="{{ url_for('db_link') }}"> Creation d'un lien à une nouvelle base </a></li>
+                </ul>
+            {% endif %}
+
 
             <ul class="nav navbar-nav navbar-right">
                 {% if not session.connexion %}
-                    <a class="center" href="{{ url_for('db_connect') }}">
-                        <button type="button" class="btn btn-lg btn-gidi">
+                    <a  href="{{ url_for('db_connect') }}">
+                        <button id="btn_connect"  type="button" class="btn btn-lg btn-gidi">
                             log in
                         </button>
                     </a>
                 {% else %}
                     <a href="{{ url_for('db_disconnect') }}">
-                        <button type="button" class="btn btn-lg btn-gidi" >
+                        <button id="btn_disconnect" type="button" class="btn btn-lg btn-gidi" >
                             log out
                         </button>
                     </a>
