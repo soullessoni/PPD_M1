@@ -81,7 +81,7 @@ def db_connect():
             session['password'] = psw
             session['host'] = host
             session['connexion'] = True
-            return redirect(url_for('db_action'))
+            return redirect(url_for('home'))
 
     else:
         return redirect(url_for('db_action'))
@@ -145,7 +145,7 @@ def index_local():
                     'ALTER TABLE "test" RENAME TO "' + table[0] + '_' + str(maladie).rstrip() + '";'
                 )
         conn.commit()
-        return redirect(url_for('db_action'))
+        return render_template('index_local_confirm.html')
     else:
         return redirect(url_for('error'))
 
@@ -224,7 +224,7 @@ def index_global():
                 print 'bip bip chui pas rentré'
             print 'okkkkkkkkkkkkkkk'
             conn.commit()
-            return redirect(url_for('db_action'))
+            return render_template('index_global_confirm.html')
     else:
         return redirect(url_for('error'))
     return render_template('index_global.html')

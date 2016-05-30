@@ -11,7 +11,6 @@
     <nav class="navbar navbar-default">
         <div class="container-fluid">
 
-
             {% if not session.connexion %}
                 <ul class="nav navbar-nav navbar-left">
                     <a class="navbar-brand" href="{{ url_for('home') }}">Gestion et Indexation des Données Incertaines</a>
@@ -28,7 +27,6 @@
                     <li><a href="{{ url_for('db_link') }}"> Creation d'un lien à une nouvelle base </a></li>
                 </ul>
             {% endif %}
-
 
             <ul class="nav navbar-nav navbar-right">
                 {% if not session.connexion %}
