@@ -132,6 +132,11 @@ fieldset[disabled] .btn-connect.focus {
     text-align: center;
 }
 
+.radio_index {
+    font-size: x-large;
+    margin: 0.4em 0em
+}
+
 #title {
     color: #FFFFFF;
     font-size: 3em;
@@ -141,6 +146,7 @@ fieldset[disabled] .btn-connect.focus {
     margin-top: 2em
 }
 
+#index_global_form,
 #db_connect_form {
     width: 40%;
     float: center;

@@ -1,14 +1,18 @@
 {% extends "container.html" %}
 {% block body %}
-  <h2>Index global</h2>
-  {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
-  <form action="{{ url_for('index_global') }}" method=post>
-    <dl>
-      <dt>Maladie :
-      <dd><input type=text name=maladie><br/>
-      <input type="radio" name=choice value="0" checked> en local
-      <input type="radio" name=choice value="1"> en distribue
-      <dd><input type=submit value=Creer>
-    </dl>
-  </form>
+    <div class="container" id="index_global_form">
+        <form class="form-signin center" action="{{ url_for('index_global') }}" method=post>
+            <h2 class="form-signin-heading">Création d'index global</h2>
+
+            <label for="maladie" class="sr-only">Maladie</label>
+            <input type="text" id="maladie" name="maladie" class="form-control" placeholder="Maladie" required autofocus>
+
+            <div class="radio_index">
+                <input type="radio" name=choice value="0" checked> Local
+                <input type="radio" name=choice value="1"> Distribué
+            </div>
+
+            <button class="btn btn-lg btn-connect btn-block" type="submit">Créer</button>
+        </form>
+    </div>
 {% endblock %}
