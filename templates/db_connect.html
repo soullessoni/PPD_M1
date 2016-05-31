@@ -1,6 +1,5 @@
 {% extends "container.html" %}
 {% block body %}
-  {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
     <div class="container" id="db_connect_form">
         <form class="form-signin center" action="{{ url_for('db_connect') }}" method=post>
             <h2 class="form-signin-heading">Please sign in</h2>
@@ -19,7 +18,5 @@
 
             <button class="btn btn-lg btn-connect btn-block" type="submit">Connect</button>
         </form>
-
     </div>
-
 {% endblock %}

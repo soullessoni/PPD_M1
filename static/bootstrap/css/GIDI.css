@@ -128,15 +128,40 @@ fieldset[disabled] .btn-connect.focus {
     background-color: #A7DBD8;
 }
 
-#title {
-    color: #FFFFFF;
+.center {
+    text-align: center;
 }
 
+.justify {
+    text-align: justify
+}
+
+.radio_index {
+    font-size: x-large;
+    margin: 0.4em 0em
+}
+
+.profile_picture {
+    width: 250px;
+    height: 250px;
+}
+
+#title {
+    color: #FFFFFF;
+    font-size: 3em;
+}
+
+#main {
+    margin-top: 2em
+}
+
+#index_global_form,
 #db_connect_form {
     width: 40%;
     float: center;
 }
 
-.center {
-    text-align: center;
+#btn_connect,
+#btn_disconnect {
+    font-size: 21px;
 }

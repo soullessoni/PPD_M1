@@ -48,11 +48,11 @@ def drop_index_local():
 
 @app.route('/')
 def home():
-    session.clear()
-    return render_template('layout.html')
+    return render_template('home.html')
 
 @app.route('/db_disconnect')
 def db_disconnect():
+    session.clear()
     return redirect(url_for('home'))
 
 @app.route('/db_connect/', methods=['GET', 'POST'])
@@ -81,7 +81,7 @@ def db_connect():
             session['password'] = psw
             session['host'] = host
             session['connexion'] = True
-            return redirect(url_for('db_action'))
+            return redirect(url_for('home'))
 
     else:
         return redirect(url_for('db_action'))
@@ -106,7 +106,7 @@ def db_action():
                 if case.default:
                     return redirect(url_for('error'))
         else:
-            return render_template('db_action.html')
+            return render_template('home.html')
     else:
         return redirect(url_for('error'))
 
@@ -145,7 +145,7 @@ def index_local():
                     'ALTER TABLE "test" RENAME TO "' + table[0] + '_' + str(maladie).rstrip() + '";'
                 )
         conn.commit()
-        return redirect(url_for('db_action'))
+        return render_template('index_local_confirm.html', active="index_local")
     else:
         return redirect(url_for('error'))
 
@@ -247,23 +247,22 @@ def index_global():
                 print 'bip bip chui pas rentré'
             print 'okkkkkkkkkkkkkkk'
             conn.commit()
-            return redirect(url_for('db_action'))
+            return render_template('index_global_confirm.html', active="index_global")
     else:
         return redirect(url_for('error'))
-    return render_template('index_global.html')
+    return render_template('index_global.html', active="index_global")
 
 @app.route('/top_k')
 def top_k():
-    return render_template('top_k.html')
+    return render_template('top_k.html', active="top_k")
 
 @app.route('/threshold')
 def threshold():
-    return render_template('threshold.html')
+    return render_template('threshold.html', active="threshold")
 
 @app.route('/db_link')
 def db_link():
-
-    return render_template('db_link.html')
+    return render_template('db_link.html', active="db_link")
 
 @app.route('/error')
 def error():
