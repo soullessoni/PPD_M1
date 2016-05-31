@@ -132,9 +132,18 @@ fieldset[disabled] .btn-connect.focus {
     text-align: center;
 }
 
+.justify {
+    text-align: justify
+}
+
 .radio_index {
     font-size: x-large;
     margin: 0.4em 0em
+}
+
+.profile_picture {
+    width: 250px;
+    height: 250px;
 }
 
 #title {
