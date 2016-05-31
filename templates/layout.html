@@ -20,11 +20,46 @@
                     <a class="navbar-brand" href="{{ url_for('home') }}">GIDI</a>
                 </ul>
                 <ul class="nav navbar-nav">
-                    <li><a href="{{ url_for('top_k') }}"> Top K </a></li>
-                    <li><a href="{{ url_for('threshold') }}"> Threshold </a></li>
-                    <li><a href="{{ url_for('index_local') }}"> Creation d'index local </a></li>
-                    <li><a href="{{ url_for('index_global') }}"> Creation d'index global </a></li>
-                    <li><a href="{{ url_for('db_link') }}"> Creation d'un lien à une nouvelle base </a></li>
+
+                {% if active == "top_k" %}
+                    <li id="top_k" class="active">
+                {% else %}
+                    <li id="top_k" class="">
+                {% endif %}
+                        <a href="{{ url_for('top_k') }}"> Top K </a>
+                    </li>
+
+                {% if active == "threshold" %}
+                    <li id="threshold" class="active">
+                {% else %}
+                    <li id="threshold" class="">
+                {% endif %}
+                        <a href="{{ url_for('threshold') }}"> Threshold </a>
+                    </li>
+
+                {% if active == "index_local" %}
+                    <li id="index_local" class="active">
+                {% else %}
+                    <li id="index_local" class="">
+                {% endif %}
+                        <a href="{{ url_for('index_local') }}"> Creation d'index local </a>
+                    </li>
+
+                {% if active == "index_global" %}
+                    <li id="index_global" class="active">
+                {% else %}
+                    <li id="index_global" class="">
+                {% endif %}
+                        <a href="{{ url_for('index_global') }}"> Creation d'index global </a>
+                    </li>
+
+                {% if active == "db_link" %}
+                    <li id="db_link" class="active">
+                {% else %}
+                    <li id="db_link" class="">
+                {% endif %}
+                        <a href="{{ url_for('db_link') }}"> Creation d'un lien à une nouvelle base </a>
+                    </li>
                 </ul>
             {% endif %}
 
