@@ -136,8 +136,11 @@ fieldset[disabled] .btn-connect.focus {
     text-align: justify
 }
 
-.radio_index {
-    font-size: x-large;
+.font-large {
+    font-size: large;
+}
+
+.upspace {
     margin: 0.4em 0em
 }
 
