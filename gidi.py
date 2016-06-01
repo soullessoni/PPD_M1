@@ -243,9 +243,9 @@ def index_global():
             print 'okkkkkkkkkkkkkkk'
             conn.commit()
             return render_template('index_global_confirm.html', active="index_global")
+        return render_template('index_global.html', active="index_global")
     else:
         return redirect(url_for('error'))
-    return render_template('index_global.html', active="index_global")
 
 @app.route('/top_k')
 def top_k():
@@ -336,16 +336,13 @@ def threshold():
                         """
                     )
 
-            tab.sort()
-            return render_template("threshold_result.html", res=tab)
-
-
-
+                tab.sort()
             conn.commit()
-            return redirect(url_for('db_action'))
+            return render_template("threshold_result.html", active="threshold", res=tab)
+        return render_template("threshold.html", active="threshold")
     else:
         return redirect(url_for('error'))
-    return render_template('threshold.html', active="threshold")
+
 
 
 @app.route('/db_link')
