@@ -183,7 +183,7 @@ def index_global():
             listeFarms = cur2.fetchall()
             for farm in listeFarms:
                 print farm[0]
-                ipName = session['host'] + '.' + farm[0]
+                ipName = session['host'] + '-' + farm[0]
                 print ipName
                 cur2.execute(
                     """
@@ -217,35 +217,18 @@ def index_global():
                     DROP TABLE index_global;
                     ALTER TABLE test RENAME TO index_global;
                 """
-                #Suppression de table_path à ajjouter si necessaire
-
+                #Suppression de table_path et table_path_ip
+                """
+                DROP TABLE IF EXISTS table_path;
+                DROP TABLE IF EXISTS table_path_ip;
+                """
             )
             print doOrNo + '==========================================='
             if (doOrNo == '1'):
+                # dblinK
                 cur4.execute(
-                    # dblinK
                     """
-                      SELECT dblink_connect('toto4', 'host=localhost port=5432 dbname=PPD1 user=postgres password=admin');
-                      INSERT INTO index_global
-                      SELECT * FROM dblink('toto4','SELECT * FROM index_global') AS t(a text ,c numeric );
-                      CREATE TABLE test (LIKE index_global);
-                      INSERT INTO test
-                      SELECT * FROM index_global ORDER BY proba DESC;
-                      DROP TABLE index_global;
-                      ALTER TABLE test RENAME TO index_global;
-                    """
-                    """
-                        SELECT dblink_connect('toto5', 'hostaddr=192.168.43.143 port=5432 dbname=PPD user=postgres password=root');
-                        INSERT INTO index_global
-                        SELECT * FROM dblink('toto5','SELECT * FROM index_global') AS t(a text ,c numeric );
-                        CREATE TABLE test (LIKE index_global);
-                        INSERT INTO test
-                        SELECT * FROM index_global ORDER BY proba DESC;
-                        DROP TABLE index_global;
-                        ALTER TABLE test RENAME TO index_global;
-                      """
-                    """
-                        SELECT dblink_connect('toto6', 'hostaddr=192.168.43.108 port=5432 dbname=PPD2 user=postgres password=root');
+                        SELECT dblink_connect('toto6', 'hostaddr=192.168.43.143 port=5432 dbname=PPD user=postgres password=root');
                         INSERT INTO index_global
                         SELECT * FROM dblink('toto6','SELECT * FROM index_global') AS t(a text ,c numeric );
                         CREATE TABLE test (LIKE index_global);
@@ -253,8 +236,6 @@ def index_global():
                         SELECT * FROM index_global ORDER BY proba DESC;
                         DROP TABLE index_global;
                         ALTER TABLE test RENAME TO index_global;
-                        SELECT dblink_disconnect('toto4');
-                        SELECT dblink_disconnect('toto5');
                         SELECT dblink_disconnect('toto6');
                       """
                 )
@@ -271,8 +252,101 @@ def index_global():
 def top_k():
     return render_template('top_k.html')
 
-@app.route('/threshold')
+@app.route('/threshold', methods=['GET', 'POST'])
 def threshold():
+    if session.get('connexion'):
+        if request.method == 'POST':
+            conn = connect()
+            cur1 = conn.cursor()
+            cur2 = conn.cursor()
+            seuil = request.form['seuil']
+            print seuil + '==============================='
+            cur1.execute(
+                """
+                DROP TABLE IF EXISTS threshold;
+                CREATE TABLE threshold (LIKE index_global);
+                DROP TABLE IF EXISTS help_proba;
+                CREATE TABLE help_proba (proba NUMERIC(10,8));
+                DROP TABLE IF EXISTS index_global_bis;
+                CREATE TABLE index_global_bis (LIKE index_global);
+                INSERT INTO index_global_bis
+                SELECT * FROM  index_global WHERE proba>= """+seuil+""";
+                """
+            )
+            cur1.execute(
+                """
+                SELECT adress FROM index_global_bis
+                """
+            )
+            listeTuples = cur1.fetchall()
+            tab = []
+            for tuple in listeTuples:
+                adressFull = tuple[0].rstrip()
+                tabAdressFull = adressFull.split("-")
+                ip = tabAdressFull[0]
+                farm = tabAdressFull[1]
+                print ip
+                print farm
+                if (ip == 'localhost'):
+                    cur2.execute(
+                        """
+                        INSERT INTO help_proba
+                        SELECT proba FROM """+farm+"""
+                        WHERE proba>=
+                        """+seuil+"""
+                        """
+                    )
+                    cur2.execute(
+                        """
+                        SELECT * FROM help_proba
+                        """
+                    )
+                    proba = cur2.fetchall()
+                    for p in proba:
+                        test = [p[0],ip, farm]
+                        tab.append(test)
+
+
+                else:
+
+                    cur2.execute(
+                        """
+                        SELECT dblink_connect('conx', 'hostaddr="""+ip+""" port=5432 dbname=PPD user=postgres password=root');
+                        """
+                    )
+
+                    cur2.execute(
+                        """
+                            INSERT INTO help_proba
+                            SELECT * FROM dblink('conx','SELECT proba FROM """ + farm + """ WHERE proba>=""" + seuil + """ ') AS t(c numeric );
+                        """
+                    )
+
+                    cur2.execute(
+                        """
+                        SELECT * FROM help_proba
+                        """
+                    )
+                    proba = cur2.fetchall()
+                    for p in proba:
+                        test = [p[0], ip, farm]
+                        tab.append(test)
+                    cur2.execute(
+                        """
+                        SELECT dblink_disconnect('conx')
+                        """
+                    )
+
+            tab.sort()
+            return render_template("threshold_result.html", res=tab)
+
+
+
+            conn.commit()
+            return redirect(url_for('db_action'))
+    else:
+        return redirect(url_for('error'))
+
     return render_template('threshold.html')
 
 @app.route('/db_link')
