@@ -5,13 +5,31 @@
             <h2 class="form-signin-heading">Création d'index global</h2>
             <div class="upspace">
                 <label for="maladie" class="sr-only">Maladie</label>
-                <input type="text" id="maladie" name="maladie" class="form-control" placeholder="Maladie" required autofocus>
+                <input type="text" id="maladie" name="maladie" class="form-control" placeholder="Maladie (Obligatoire)" required autofocus>
+                <input type="text" id="ip1" name="ip1" class="form-control" placeholder="Veuillez rentrer un IP (Obligatoire)" style="display: none">
+                <input type="text" id="ip2" name="ip2" class="form-control" placeholder="Veuillez rentrer un IP" style="display: none">
+                <input type="text" id="ip3" name="ip3" class="form-control" placeholder="Veuillez rentrer un IP" style="display: none">
                 <div class="font-large upspace">
-                    <input type="radio" name=choice value="0" checked> Local
-                    <input type="radio" name=choice value="1"> Distribué
+                    <input type="radio" name=choice value="0" onClick="hide()" checked> Local
+                    <input type="radio" name=choice value="1" onClick="show()"> Distribué
                 </div>
             </div>
             <button class="btn btn-lg btn-connect btn-block" type="submit">Créer</button>
         </form>
     </div>
+
+    <script type="text/javascript">
+        var show = function () {
+            $("#ip1").show()
+                .prop('required',true);
+            $("#ip2").show();
+            $("#ip3").show();
+        }
+        var hide = function () {
+            $("#ip1").hide()
+                .prop('required',false);
+            $("#ip2").hide();
+            $("#ip3").hide();
+        }
+    </script>
 {% endblock %}
