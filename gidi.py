@@ -29,9 +29,11 @@ def drop_index_local():
         cur1 = conn.cursor()
         cur2 = conn.cursor()
         cur1.execute(
-            'SELECT table_name '
-            'FROM INFORMATION_SCHEMA.TABLES '
-            'WHERE table_name LIKE \'farm%\';'
+            """
+                SELECT table_name
+                FROM INFORMATION_SCHEMA.TABLES
+                WHERE table_name LIKE \'farm%\';
+            """
         )
         tables = cur1.fetchall()
         #Please a good RegEx
@@ -167,17 +169,21 @@ def index_global():
             print sick
             cur2.execute(
                 #creation de table_path et la remplir
-                'DROP TABLE IF EXISTS table_path;'
-                'CREATE TABLE table_path(adress CHAR(100));'
-                'insert into table_path (adress)'
-                'SELECT table_name FROM INFORMATION_SCHEMA.TABLES WHERE table_name LIKE \'%_' + sick + '\';'
-                """DROP TABLE IF EXISTS table_path_ip;
-                    CREATE TABLE table_path_ip(adress CHAR(100));"""
+                """
+                    DROP TABLE IF EXISTS table_path;
+                    CREATE TABLE table_path(adress CHAR(100));
+                    insert into table_path (adress)
+                    SELECT table_name FROM INFORMATION_SCHEMA.TABLES WHERE table_name LIKE \'%_' + sick + '\';
+                    DROP TABLE IF EXISTS table_path_ip;
+                    CREATE TABLE table_path_ip(adress CHAR(100));
+                """
             )
 
             print '++++++++++++++++++++++++++'
             cur2.execute(
-                """SELECT adress FROM table_path"""
+                """
+                    SELECT adress FROM table_path
+                """
             )
             listeFarms = cur2.fetchall()
             for farm in listeFarms:
@@ -186,13 +192,16 @@ def index_global():
                 print ipName
                 cur2.execute(
                     """
-                    INSERT INTO table_path_ip(adress) VALUES('""" + ipName + """')"""
+                        INSERT INTO table_path_ip(adress) VALUES('""" + ipName + """')
+                    """
                 )
             print '++++++++++++++++++++++++++'
 
             cur3.execute(
                 #pour remplir la listeTablesSick en bas
-                'SELECT adress FROM table_path;'
+                """
+                    SELECT adress FROM table_path;
+                """
             )
             listeTablesSick = cur3.fetchall()
             print listeTablesSick
@@ -201,16 +210,19 @@ def index_global():
                 print liste[0]
                 cur3.execute(
                     #remplir l'index global
-                    """INSERT INTO index_global(adress, proba)
-                    SELECT table_path_ip.adress, """+ liste[0].rstrip() +""".proba FROM table_path_ip, """+ liste[0].rstrip() +""" LIMIT 1;
-                    DELETE FROM table_path WHERE ctid IN (SELECT ctid FROM table_path LIMIT 1);
-                    DELETE FROM table_path_ip WHERE ctid IN (SELECT ctid FROM table_path_ip LIMIT 1)"""
+                    """
+                        INSERT INTO index_global(adress, proba)
+                        SELECT table_path_ip.adress, """+ liste[0].rstrip() +""".proba FROM table_path_ip, """+ liste[0].rstrip() +""" LIMIT 1;
+                        DELETE FROM table_path WHERE ctid IN (SELECT ctid FROM table_path LIMIT 1);
+                        DELETE FROM table_path_ip WHERE ctid IN (SELECT ctid FROM table_path_ip LIMIT 1)
+                    """
                 )
             print 'en haut pas touche'
             test = 'toto3'
             cur4.execute(
                 # mettre en ordre l'index global
-                """CREATE TABLE test (LIKE index_global);
+                """
+                    CREATE TABLE test (LIKE index_global);
                     INSERT INTO test
                     SELECT * FROM index_global ORDER BY proba DESC;
                     DROP TABLE index_global;
@@ -218,8 +230,8 @@ def index_global():
                 """
                 #Suppression de table_path et table_path_ip
                 """
-                DROP TABLE IF EXISTS table_path;
-                DROP TABLE IF EXISTS table_path_ip;
+                    DROP TABLE IF EXISTS table_path;
+                    DROP TABLE IF EXISTS table_path_ip;
                 """
             )
             print doOrNo + '==========================================='
@@ -236,7 +248,7 @@ def index_global():
                         DROP TABLE index_global;
                         ALTER TABLE test RENAME TO index_global;
                         SELECT dblink_disconnect('toto6');
-                      """
+                    """
                 )
             else:
                 print 'bip bip chui pas rentré'
@@ -262,19 +274,19 @@ def threshold():
             print seuil + '==============================='
             cur1.execute(
                 """
-                DROP TABLE IF EXISTS threshold;
-                CREATE TABLE threshold (LIKE index_global);
-                DROP TABLE IF EXISTS help_proba;
-                CREATE TABLE help_proba (proba NUMERIC(10,8));
-                DROP TABLE IF EXISTS index_global_bis;
-                CREATE TABLE index_global_bis (LIKE index_global);
-                INSERT INTO index_global_bis
-                SELECT * FROM  index_global WHERE proba>= """+seuil+""";
+                    DROP TABLE IF EXISTS threshold;
+                    CREATE TABLE threshold (LIKE index_global);
+                    DROP TABLE IF EXISTS help_proba;
+                    CREATE TABLE help_proba (proba NUMERIC(10,8));
+                    DROP TABLE IF EXISTS index_global_bis;
+                    CREATE TABLE index_global_bis (LIKE index_global);
+                    INSERT INTO index_global_bis
+                    SELECT * FROM  index_global WHERE proba>= """+seuil+""";
                 """
             )
             cur1.execute(
                 """
-                SELECT adress FROM index_global_bis
+                    SELECT adress FROM index_global_bis
                 """
             )
             listeTuples = cur1.fetchall()
@@ -289,15 +301,15 @@ def threshold():
                 if (ip == 'localhost'):
                     cur2.execute(
                         """
-                        INSERT INTO help_proba
-                        SELECT proba FROM """+farm+"""
-                        WHERE proba>=
-                        """+seuil+"""
+                            INSERT INTO help_proba
+                            SELECT proba FROM """+farm+"""
+                            WHERE proba>=
+                            """+seuil+"""
                         """
                     )
                     cur2.execute(
                         """
-                        SELECT * FROM help_proba
+                            SELECT * FROM help_proba
                         """
                     )
                     proba = cur2.fetchall()
@@ -310,7 +322,7 @@ def threshold():
 
                     cur2.execute(
                         """
-                        SELECT dblink_connect('conx', 'hostaddr="""+ip+""" port=5432 dbname=PPD user=postgres password=root');
+                            SELECT dblink_connect('conx', 'hostaddr="""+ip+""" port=5432 dbname=PPD user=postgres password=root');
                         """
                     )
 
@@ -323,7 +335,7 @@ def threshold():
 
                     cur2.execute(
                         """
-                        SELECT * FROM help_proba
+                            SELECT * FROM help_proba
                         """
                     )
                     proba = cur2.fetchall()
@@ -332,7 +344,7 @@ def threshold():
                         tab.append(test)
                     cur2.execute(
                         """
-                        SELECT dblink_disconnect('conx')
+                            SELECT dblink_disconnect('conx')
                         """
                     )
 
