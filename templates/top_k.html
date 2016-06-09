@@ -1,4 +1,8 @@
 {% extends "container.html" %}
 {% block body %}
-     TOP K
+{% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
+<form action="{{ url_for('top_k') }}" method=post>
+    <dd>Top : <input type=number min=0 max=400 name=nb_max>
+    <input type=submit value="Top_K">
+</form>
 {% endblock %}

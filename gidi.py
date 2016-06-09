@@ -18,6 +18,8 @@ app.config.from_object(__name__)
 #File with disease's name
 fmaladie_name = "maladies_bovines.txt"
 
+adresseIPLocalhost = ['localhost', '127.0.0.1']
+
 def connect():
     return psycopg2.connect("dbname='"+ session['db_name'] +
                             "' user='"+ session['user'] +
@@ -247,9 +249,134 @@ def index_global():
     else:
         return redirect(url_for('error'))
 
-@app.route('/top_k')
+@app.route('/top_k', methods=['GET', 'POST'])
 def top_k():
-    return render_template('top_k.html', active="top_k")
+    if session.get('connexion'):
+        if request.method == 'POST':
+            conn = connect()
+            cur1 = conn.cursor()
+            cur1.execute(
+                """
+                SELECT * FROM index_global order by proba desc;
+                """
+            )
+            conn.commit()
+            listeTuples = cur1.fetchall()   #on récupère l'index_global dans une liste
+            top_k = request.form['nb_max']
+            ProbaSeuil = []
+            for tuple in listeTuples:    #pour chaque tuple de l'index_global, on extraie l'adresseIP et la farm_n grâce au champ "address" du tuple
+                nomTuple = tuple[0].rstrip().split("-",1)
+                adresseIP = nomTuple[0]
+                farm_n = nomTuple[1]
+                if adresseIP in adresseIPLocalhost:
+                    cur1.execute(
+                        """
+                        SELECT dblink_connect('"""+adresseIP+"""', 'host="""+adresseIP+""" port=5432 dbname=PPD1 user=postgres password=root');
+                        SELECT * FROM dblink('"""+adresseIP+"""', 'SELECT * FROM """+farm_n+""" order by proba desc LIMIT 1 OFFSET """+top_k+"""') AS tuple(id integer, p numeric);
+                        """
+                    )
+                else:
+                    cur1.execute(
+                        """
+                        SELECT dblink_connect('"""+adresseIP+"""', 'hostaddr="""+adresseIP+""" port=5432 dbname=PPD1 user=postgres password=root');
+                        SELECT * FROM dblink('"""+adresseIP+"""', 'SELECT * FROM """+farm_n+""" order by proba desc LIMIT 1 OFFSET """+top_k+"""') AS tuple(id integer, p numeric);
+                        """
+                    )
+                ProbaTemp = cur1.fetchone() #on récupère la kième probabilité de la farm correspondant au tuple
+                print(ProbaTemp)
+                if not ProbaSeuil:  #on stocke la kième proba et on détermine si elle va devenir la proba "seuil"
+                    ProbaSeuil = ProbaTemp
+                elif(ProbaTemp[1] >= ProbaSeuil[1]):
+                    ProbaSeuil = ProbaTemp
+                cur1.execute(
+                    """
+                    SELECT dblink_disconnect('"""+adresseIP+"""');
+                    """
+                )
+                print(ProbaSeuil)
+            ProbaK = str(ProbaSeuil[1])
+            cur1.execute(
+                """
+                DROP TABLE IF EXISTS threshold;
+                CREATE TABLE threshold (LIKE index_global);
+                DROP TABLE IF EXISTS help_proba;
+                CREATE TABLE help_proba (proba NUMERIC(10,8));
+                DROP TABLE IF EXISTS index_global_bis;
+                CREATE TABLE index_global_bis (LIKE index_global);
+                INSERT INTO index_global_bis
+                SELECT * FROM  index_global WHERE proba>= """+ProbaK+""";
+                """
+            )
+            cur1.execute(
+                """
+                SELECT adress FROM index_global_bis
+                """
+            )
+            listeTuples = cur1.fetchall()
+            topKProbas = []
+            for tuple in listeTuples:
+                adressFull = tuple[0].rstrip()
+                tabAdressFull = adressFull.split("-")
+                ip = tabAdressFull[0]
+                farm = tabAdressFull[1]
+                print ip
+                print farm
+                if (ip == 'localhost'):
+                    cur1.execute(
+                        """
+                        INSERT INTO help_proba
+                        SELECT proba FROM """+farm+"""
+                        WHERE proba>=
+                        """+ProbaK+"""
+                        """
+                    )
+                    cur1.execute(
+                        """
+                        SELECT * FROM help_proba
+                        """
+                    )
+                    proba = cur1.fetchall()
+                    print(proba)
+                    for p in proba:
+                        test = [p[0],ip, farm]
+                        topKProbas.append(test)
+                    print(topKProbas)
+                else:
+
+                    cur1.execute(
+                        """
+                        SELECT dblink_connect('conx', 'hostaddr="""+ip+""" port=5432 dbname=PPD user=postgres password=root');
+                        """
+                    )
+
+                    cur1.execute(
+                        """
+                        INSERT INTO help_proba
+                        SELECT * FROM dblink('conx','SELECT proba FROM """ + farm + """ WHERE proba>=""" + ProbaK + """ ') AS t(c numeric );
+                        """
+                    )
+                    cur1.execute(
+                        """
+                        SELECT * FROM help_proba oder by proba desc;
+                        """
+                    )
+                    proba = cur1.fetchall()
+                    print(proba)
+                    for p in proba:
+                        test = [p[0], ip, farm]
+                        topKProbas.append(test)
+                    print(topKProbas)
+                    cur1.execute(
+                        """
+                        SELECT dblink_disconnect('conx')
+                        """
+                    )
+            topKProbas = sorted(topKProbas, key = lambda tup : tup[0], reverse=True)
+            return render_template("top_k_result.html", active="top_k", res=topKProbas)
+        else:
+            return render_template("top_k.html", active="top_k")
+    else:
+        return redirect(url_for('error'))
 
 @app.route('/threshold', methods=['GET', 'POST'])
 def threshold():
@@ -316,8 +443,8 @@ def threshold():
 
                     cur2.execute(
                         """
-                            INSERT INTO help_proba
-                            SELECT * FROM dblink('conx','SELECT proba FROM """ + farm + """ WHERE proba>=""" + seuil + """ ') AS t(c numeric );
+                        INSERT INTO help_proba
+                        SELECT * FROM dblink('conx','SELECT proba FROM """ + farm + """ WHERE proba>=""" + seuil + """ ') AS t(c numeric );
                         """
                     )
 
