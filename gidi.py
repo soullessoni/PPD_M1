@@ -245,9 +245,146 @@ def index_global():
     else:
         return redirect(url_for('error'))
 
-@app.route('/top_k')
+@app.route('/top_k', methods=['GET', 'POST'])
 def top_k():
-    return render_template('top_k.html', active="top_k")
+    if session.get('connexion'):
+        if request.method == 'POST':
+            conn = connect()
+            cur1 = conn.cursor()
+            cur2 = conn.cursor()
+            cur3 = conn.cursor()
+            nbK = request.form['nb_k']
+            print nbK
+            nbKOfsset = int(nbK) - 1
+            tab_kieme = []
+            tab = []
+            cur1.execute(
+                """
+                SELECT adress FROM index_global;
+                """
+            )
+            liste = cur1.fetchall()
+            for l in liste:
+                adressFull = l[0].rstrip()
+                tabAdressFull = adressFull.split("-")
+                ip = tabAdressFull[0]
+                farm = tabAdressFull[1]
+                if (ip == 'localhost'):
+                    cur2.execute(
+                        """
+                        SELECT proba FROM """+farm+""" LIMIT 1 offset """+str(nbKOfsset)+""" ;
+                        """
+                    )
+                    tab_kieme.append(cur2.fetchall())
+                else :
+                    cur2.execute(
+                        """
+                        SELECT dblink_connect('conx', 'hostaddr="""+ip+""" port=5432 dbname=PPD user=postgres password=root');
+                        """
+                    )
+                    cur2.execute(
+                        """
+                        SELECT * FROM dblink('conx','SELECT proba FROM """+farm+""" LIMIT 1 offset """+str(nbKOfsset)+"""') AS t(c numeric );
+                        """
+                    )
+                    tab_kieme.append(cur2.fetchall())
+                    cur2.execute(
+                        """
+                        SELECT dblink_disconnect('conx');
+                        """
+                    )
+            tab_kieme.sort(reverse=True)
+            delta_k_tab = tab_kieme[0]
+            delta_k = delta_k_tab[0][0]
+            cur3.execute(
+                """
+                DROP TABLE IF EXISTS top_k;
+                CREATE TABLE top_k (LIKE index_global);
+                DROP TABLE IF EXISTS help_proba;
+                CREATE TABLE help_proba (proba NUMERIC(10,8));
+                DROP TABLE IF EXISTS index_global_bis;
+                CREATE TABLE index_global_bis (LIKE index_global);
+                INSERT INTO index_global_bis
+                SELECT * FROM  index_global WHERE proba>= """ + str(delta_k) + """;
+                """
+            )
+            cur1.execute(
+                """
+                SELECT adress FROM index_global_bis
+                """
+            )
+            listeTuples = cur1.fetchall()
+            tab = []
+            for tuple in listeTuples:
+                adressFull = tuple[0].rstrip()
+                tabAdressFull = adressFull.split("-")
+                ip = tabAdressFull[0]
+                farm = tabAdressFull[1]
+                if (ip == 'localhost'):
+                    cur2.execute(
+                        """
+                        TRUNCATE TABLE help_proba;
+                        INSERT INTO help_proba
+                        SELECT proba FROM """ + farm + """
+                        WHERE proba>=
+                        """ + str(delta_k) + """
+                        """
+                    )
+                    cur2.execute(
+                        """
+                        SELECT * FROM help_proba
+                        """
+                    )
+                    proba = cur2.fetchall()
+                    for p in proba:
+                        test = [p[0], ip, farm]
+                        tab.append(test)
+
+
+                else:
+
+                    cur2.execute(
+                        """
+                        SELECT dblink_connect('conx', 'hostaddr=""" + ip + """ port=5432 dbname=PPD user=postgres password=root');
+                        """
+                    )
+
+                    cur2.execute(
+                        """
+                            TRUNCATE TABLE help_proba;
+                            INSERT INTO help_proba
+                            SELECT * FROM dblink('conx','SELECT proba FROM """ + farm + """ WHERE proba>=""" + str(delta_k) + """ ') AS t(c numeric );
+                        """
+                    )
+
+                    cur2.execute(
+                        """
+                        SELECT * FROM help_proba
+                        """
+                    )
+                    proba = cur2.fetchall()
+                    for p in proba:
+                        test = [p[0], ip, farm]
+                        tab.append(test)
+                    cur2.execute(
+                        """
+                        SELECT dblink_disconnect('conx')
+                        """
+                    )
+                tab.sort(reverse=True)
+            cur1.execute(
+                """
+                DROP TABLE IF EXISTS top_k;
+                DROP TABLE IF EXISTS help_proba;
+                DROP TABLE IF EXISTS index_global_bis;
+                """
+            )
+            conn.commit()
+            return render_template("topk_result.html", active="top_k", res=tab)
+        return render_template("top_k.html", active="top_k")
+
+    else:
+        return redirect(url_for('error'))
 
 @app.route('/threshold', methods=['GET', 'POST'])
 def threshold():
@@ -285,6 +422,7 @@ def threshold():
                 if (ip == 'localhost'):
                     cur2.execute(
                         """
+                        TRUNCATE TABLE help_proba;
                         INSERT INTO help_proba
                         SELECT proba FROM """+farm+"""
                         WHERE proba>=
@@ -312,6 +450,7 @@ def threshold():
 
                     cur2.execute(
                         """
+                            TRUNCATE TABLE help_proba;
                             INSERT INTO help_proba
                             SELECT * FROM dblink('conx','SELECT proba FROM """ + farm + """ WHERE proba>=""" + seuil_check + """ ') AS t(c numeric );
                         """
@@ -331,7 +470,7 @@ def threshold():
                         SELECT dblink_disconnect('conx')
                         """
                     )
-                tab.sort()
+                tab.sort(reverse=True)
             cur1.execute(
                 """
                 DROP TABLE IF EXISTS threshold;
