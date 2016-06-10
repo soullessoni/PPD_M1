@@ -254,7 +254,6 @@ def top_k():
             cur2 = conn.cursor()
             cur3 = conn.cursor()
             nbK = request.form['nb_k']
-            print nbK
             nbKOfsset = int(nbK) - 1
             tab_kieme = []
             tab = []
@@ -371,7 +370,10 @@ def top_k():
                         SELECT dblink_disconnect('conx')
                         """
                     )
-                tab.sort(reverse=True)
+            tab.sort(reverse=True)
+            tab_result = []
+            for t in range(0, int(nbK)):
+                tab_result.append(tab[t])
             cur1.execute(
                 """
                 DROP TABLE IF EXISTS top_k;
@@ -380,7 +382,7 @@ def top_k():
                 """
             )
             conn.commit()
-            return render_template("topk_result.html", active="top_k", res=tab)
+            return render_template("topk_result.html", active="top_k", res=tab_result)
         return render_template("top_k.html", active="top_k")
 
     else:
