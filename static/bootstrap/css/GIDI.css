@@ -159,6 +159,7 @@ fieldset[disabled] .btn-connect.focus {
 }
 
 #index_global_form,
+#index_global_MD_form,
 #db_connect_form {
     width: 40%;
     float: center;

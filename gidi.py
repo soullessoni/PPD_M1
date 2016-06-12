@@ -402,7 +402,7 @@ def threshold():
                 DROP TABLE IF EXISTS threshold;
                 CREATE TABLE threshold (LIKE index_global);
                 DROP TABLE IF EXISTS help_proba;
-                CREATE TABLE help_proba (proba NUMERIC(10,8));
+                CREATE TABLE help_proba (proba NUMERIC(10,9));
                 DROP TABLE IF EXISTS index_global_bis;
                 CREATE TABLE index_global_bis (LIKE index_global);
                 INSERT INTO index_global_bis
@@ -489,9 +489,152 @@ def threshold():
 
 
 
-@app.route('/db_link')
-def db_link():
-    return render_template('db_link.html', active="db_link")
+@app.route('/index_global_MD', methods=['GET', 'POST'])
+def index_global_MD():
+    if session.get('connexion'):
+        if request.method == 'POST':
+            conn = connect()
+            cur1 = conn.cursor()
+            cur2 = conn.cursor()
+            cur3 = conn.cursor()
+            cur4 = conn.cursor()
+            cur1.execute(
+                "DROP TABLE IF EXISTS index_global;"
+                "CREATE TABLE index_global(adress CHAR(100), proba NUMERIC(10,8));"
+                "DROP TABLE IF EXISTS index_global_MD;"
+                "CREATE TABLE index_global_md(adress CHAR(100), proba NUMERIC(10,8), md NUMERIC (10,8));"
+            )
+            tab_ip = []
+            sick = request.form['maladie']
+            ip1 = request.form['ip1']
+            tab_ip.append(ip1)
+            ip2 = request.form['ip2']
+            tab_ip.append(ip2)
+            ip3 = request.form['ip3']
+            tab_ip.append(ip3)
+            doOrNo = request.form['choice']
+            cur2.execute(
+                # creation de table_path et la remplir
+                'DROP TABLE IF EXISTS table_path;'
+                'CREATE TABLE table_path(adress CHAR(100));'
+                'insert into table_path (adress)'
+                'SELECT table_name FROM INFORMATION_SCHEMA.TABLES WHERE table_name LIKE \'%_' + sick + '\';'
+                                                                                                       """DROP TABLE IF EXISTS table_path_ip;
+                                                                                                           CREATE TABLE table_path_ip(adress CHAR(100));"""
+            )
+
+            cur2.execute(
+                """SELECT adress FROM table_path"""
+            )
+            listeFarms = cur2.fetchall()
+            for farm in listeFarms:
+                ipName = session['host'] + '-' + farm[0]
+                cur2.execute(
+                    """
+                    INSERT INTO table_path_ip(adress) VALUES('""" + ipName + """')"""
+                )
+
+            cur3.execute(
+                # pour remplir la listeTablesSick en bas
+                'SELECT adress FROM table_path;'
+            )
+            listeTablesSick = cur3.fetchall()
+            for liste in listeTablesSick:
+                cur3.execute(
+                    # remplir l'index global
+                    """INSERT INTO index_global(adress, proba)
+                    SELECT table_path_ip.adress, """ + liste[0].rstrip() + """.proba FROM table_path_ip, """ + liste[
+                        0].rstrip() + """ LIMIT 1;
+                    DELETE FROM table_path WHERE ctid IN (SELECT ctid FROM table_path LIMIT 1);
+                    DELETE FROM table_path_ip WHERE ctid IN (SELECT ctid FROM table_path_ip LIMIT 1)"""
+                )
+            cur4.execute(
+                # mettre en ordre l'index global
+                """CREATE TABLE test (LIKE index_global);
+                    INSERT INTO test
+                    SELECT * FROM index_global ORDER BY proba DESC;
+                    DROP TABLE index_global;
+                    ALTER TABLE test RENAME TO index_global;
+                """
+                # Suppression de table_path et table_path_ip
+                """
+                DROP TABLE IF EXISTS table_path;
+                DROP TABLE IF EXISTS table_path_ip;
+                """
+            )
+            if (doOrNo == '1'):
+                for ip in tab_ip:
+                    print ip
+                    if ip:
+                        # dblinK
+                        cur4.execute(
+                            """
+                              SELECT dblink_connect('conx', 'hostaddr=""" + ip + """ port=5432 dbname=PPD user=postgres password=root');
+                              INSERT INTO index_global
+                              SELECT * FROM dblink('conx','SELECT * FROM index_global') AS t(a text ,c numeric );
+                              CREATE TABLE test (LIKE index_global);
+                              INSERT INTO test
+                              SELECT * FROM index_global ORDER BY proba DESC;
+                              DROP TABLE index_global;
+                              ALTER TABLE test RENAME TO index_global;
+                              SELECT dblink_disconnect('conx');
+
+                            """
+                        )
+                    else:
+                        print "pas de ip rentrer"
+            else :
+                cur4.execute(
+                    """
+                    SELECT * FROM index_global;
+                    """
+                )
+                list_index_global = cur4.fetchall()
+                for list in list_index_global:
+                    adressFull = list[0].rstrip()
+                    tabAdressFull = adressFull.split("-")
+                    ip = tabAdressFull[0]
+                    farm = tabAdressFull[1]
+                    prb = list[1]
+                    f_prb = float(prb)
+                    cur1.execute(
+                        """
+                        SELECT proba FROM """+ farm +""";
+                        """
+                    )
+                    test = cur1.fetchall()
+                    res = 0
+                    pb = 0
+                    i = 1
+                    end = len(test)
+                    for t in test:
+                        if (i < end):
+                            cur2.execute(
+                                """
+                                SELECT proba FROM """ + farm + """ LIMIT 1 OFFSET """+ str(i) + """;
+                                """
+                            )
+                            pb_sous = cur2.fetchall()
+                            f_pb_sous = float(pb_sous[0][0])
+                            res = res + ((f_prb - f_pb_sous )/i)
+                            i = i + 1
+                        else :
+                            res = res / (i - 1)
+                    cur3.execute(
+                        """
+                        INSERT INTO index_global_md(adress, proba, md)
+                        VALUES ('"""+ str(adressFull) +"""', '"""+ str(prb) +"""', '"""+ str(res) +"""');
+                        """
+                    )
+
+
+
+            conn.commit()
+            return render_template('index_global_MD_confirm.html', active="index_global_MD")
+        return render_template('index_global_MD.html', active="index_global_MD")
+    else:
+        return redirect(url_for('error'))
+
 
 @app.route('/error')
 def error():
