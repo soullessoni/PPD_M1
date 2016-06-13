@@ -1,9 +1,14 @@
 {% extends "container.html" %}
 {% block body %}
-    <h2>Threshold</h2>
-  {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
-<form action="{{ url_for('threshold') }}" method=post>
-    <dd>Seuil : <input type=number step=0.00000001 min=0 max=1 name=seuil><br/>
-    <input type=submit value="threshold">
-</form>
+    <div class="container" id="db_connect_form">
+        <form action="{{ url_for('threshold') }}" method=post>
+            <h2 class="form-signin-heading">Threshold in</h2>
+
+            Seuil :
+            <label for="seuil" class="sr-only"></label>
+            <input type="number" step=0.0001 min=0 max=1 id="seuil" name="seuil" class="form-control" placeholder="0.0000" required><br>
+
+            <button class="btn btn-lg btn-connect btn-block" type="submit">Threshold</button>
+        </form>
+    </div>
 {% endblock %}
