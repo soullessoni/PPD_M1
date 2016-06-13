@@ -174,14 +174,12 @@ def index_global():
             doOrNo = request.form['choice']
             cur2.execute(
                 #creation de table_path et la remplir
-                """
-                    DROP TABLE IF EXISTS table_path;
-                    CREATE TABLE table_path(adress CHAR(100));
-                    insert into table_path (adress)
-                    SELECT table_name FROM INFORMATION_SCHEMA.TABLES WHERE table_name LIKE \'%_' + sick + '\';
-                    DROP TABLE IF EXISTS table_path_ip;
-                    CREATE TABLE table_path_ip(adress CHAR(100));
-                """
+                'DROP TABLE IF EXISTS table_path;'
+                'CREATE TABLE table_path(adress CHAR(100));'
+                'insert into table_path (adress)'
+                'SELECT table_name FROM INFORMATION_SCHEMA.TABLES WHERE table_name LIKE \'%_' + sick + '\';'
+                """DROP TABLE IF EXISTS table_path_ip;
+                CREATE TABLE table_path_ip(adress CHAR(100));"""
             )
 
             cur2.execute(
@@ -535,8 +533,8 @@ def index_global_MD():
                 'CREATE TABLE table_path(adress CHAR(100));'
                 'insert into table_path (adress)'
                 'SELECT table_name FROM INFORMATION_SCHEMA.TABLES WHERE table_name LIKE \'%_' + sick + '\';'
-                                                                                                       """DROP TABLE IF EXISTS table_path_ip;
-                                                                                                           CREATE TABLE table_path_ip(adress CHAR(100));"""
+                """DROP TABLE IF EXISTS table_path_ip;
+                CREATE TABLE table_path_ip(adress CHAR(100));"""
             )
 
             cur2.execute(
