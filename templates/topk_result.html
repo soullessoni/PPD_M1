@@ -1,4 +1,6 @@
 {% extends "container.html" %}
 {% block body %}
-     DB LINK
+     {% for t in res %}
+        {{ t }} <br>
+    {% endfor %}
 {% endblock %}

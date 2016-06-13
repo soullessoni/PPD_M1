@@ -4,6 +4,7 @@
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='bootstrap/css/GIDI.css') }}">
 
 <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.js') }}"> </script>
+<script src="{{ url_for('static', filename='jquery-2.2.4.min.js') }}"> </script>
 <title>GIDI</title>
 
 <div class="container" role="main" id="main">
@@ -54,11 +55,11 @@
                     </li>
 
                 {% if active == "db_link" %}
-                    <li id="db_link" class="active">
+                    <li id="index_global_MD" class="active">
                 {% else %}
-                    <li id="db_link" class="">
+                    <li id="index_global_MD" class="">
                 {% endif %}
-                        <a href="{{ url_for('db_link') }}"> Creation d'un lien à une nouvelle base </a>
+                        <a href="{{ url_for('index_global_MD') }}"> Creation IG avec Moyenne disperssion </a>
                     </li>
                 </ul>
             {% endif %}

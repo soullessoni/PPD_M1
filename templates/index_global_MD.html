@@ -1,8 +1,8 @@
 {% extends "container.html" %}
 {% block body %}
-    <div class="container" id="index_global_form">
-        <form class="form-signin center" action="{{ url_for('index_global') }}" method=post>
-            <h2 class="form-signin-heading">Création d'index global</h2>
+    <div class="container" id="index_global_MD_form">
+        <form class="form-signin center" action="{{ url_for('index_global_MD') }}" method=post>
+            <h2 class="form-signin-heading">Création d'index global avec la moyenne de dispersion</h2>
             <div class="upspace">
                 <label for="maladie" class="sr-only">Maladie</label>
                 <input type="text" id="maladie" name="maladie" class="form-control" placeholder="Maladie (Obligatoire)" required autofocus>
@@ -17,7 +17,6 @@
             <button class="btn btn-lg btn-connect btn-block" type="submit">Créer</button>
         </form>
     </div>
-
     <script type="text/javascript">
         var show = function () {
             $("#ip1").show()
