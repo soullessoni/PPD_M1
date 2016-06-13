@@ -1,10 +1,17 @@
 {% extends "container.html" %}
 {% block body %}
-    <h2>TOP_K</h2>
+
   {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
-<form action="{{ url_for('top_k') }}" method=post>
-    <dd>Rentrez le nombre K que vous voulez :
-        <input type=number step=1 min=0 max=400 name=nb_k><br/>
-    <input type=submit value="top_k">
-</form>
+    <div class="container" id="db_connect_form">
+        <form class="form-signin center" action="{{ url_for('top_k') }}" method=post>
+            <h2 class="form-signin-heading">Top_k in</h2>
+            Rentrez le nombre K que vous voulez :
+            <label for="seuil" class="sr-only"></label>
+            <input type="number" step=1 min=0 max=400 id="nb_k" name="nb_k" class="form-control" placeholder="0" required><br>
+
+            <button class="btn btn-lg btn-connect btn-block" type="submit">top_k</button>
+
+        </form>
+    </div>
+
 {% endblock %}
