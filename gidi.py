@@ -5,6 +5,7 @@
 import psycopg2
 from switch import Switch
 import re
+import time
 import sys
 import pprint
 
@@ -116,6 +117,7 @@ def db_action():
 def index_local():
     if session.get('connexion'):
         drop_index_local()
+        debutTopK = time.time()
         conn = connect()
         cur1 = conn.cursor()
         cur2 = conn.cursor()
@@ -146,6 +148,8 @@ def index_local():
                     'ALTER TABLE "test" RENAME TO "' + table[0] + '_' + str(maladie).rstrip() + '";'
                 )
         conn.commit()
+        tmpTopK = time.time() - debutTopK
+        flash(tmpTopK)
         return render_template('index_local_confirm.html', active="index_local")
     else:
         return redirect(url_for('error'))
@@ -154,6 +158,7 @@ def index_local():
 def index_global():
     if session.get('connexion'):
         if request.method == 'POST':
+            debutTopK = time.time()
             conn = connect()
             cur1 = conn.cursor()
             cur2 = conn.cursor()
@@ -174,13 +179,13 @@ def index_global():
             doOrNo = request.form['choice']
             cur2.execute(
                 #creation de table_path et la remplir
+                'DROP TABLE IF EXISTS table_path;'
+                'CREATE TABLE table_path(adress CHAR(100));'
+                'insert into table_path (adress)'
+                'SELECT table_name FROM INFORMATION_SCHEMA.TABLES WHERE table_name LIKE \'%_' + sick + '\';'
                 """
-                    DROP TABLE IF EXISTS table_path;
-                    CREATE TABLE table_path(adress CHAR(100));
-                    insert into table_path (adress)
-                    SELECT table_name FROM INFORMATION_SCHEMA.TABLES WHERE table_name LIKE \'%_' + sick + '\';
-                    DROP TABLE IF EXISTS table_path_ip;
-                    CREATE TABLE table_path_ip(adress CHAR(100));
+                DROP TABLE IF EXISTS table_path_ip;
+                CREATE TABLE table_path_ip(adress CHAR(100));
                 """
             )
 
@@ -254,6 +259,8 @@ def index_global():
                         print "pas de ip rentrer"
 
             conn.commit()
+            tmpTopK = time.time() - debutTopK
+            flash(tmpTopK)
             return render_template('index_global_confirm.html', active="index_global")
         return render_template('index_global.html', active="index_global")
     else:
@@ -263,6 +270,7 @@ def index_global():
 def top_k():
     if session.get('connexion'):
         if request.method == 'POST':
+            debutTopK = time.time()
             conn = connect()
             cur1 = conn.cursor()
             cur2 = conn.cursor()
@@ -396,6 +404,8 @@ def top_k():
                 """
             )
             conn.commit()
+            tmpTopK = time.time() - debutTopK
+            flash(tmpTopK)
             return render_template("topk_result.html", active="top_k", res=tab_result)
         return render_template("top_k.html", active="top_k")
 
@@ -406,6 +416,7 @@ def top_k():
 def threshold():
     if session.get('connexion'):
         if request.method == 'POST':
+            debutTopK = time.time()
             conn = connect()
             cur1 = conn.cursor()
             cur2 = conn.cursor()
@@ -498,6 +509,8 @@ def threshold():
             )
 
             conn.commit()
+            tmpTopK = time.time() - debutTopK
+            flash(tmpTopK)
             return render_template("threshold_result.html", active="threshold", res=tab)
         return render_template("threshold.html", active="threshold")
     else:
@@ -509,6 +522,7 @@ def threshold():
 def index_global_MD():
     if session.get('connexion'):
         if request.method == 'POST':
+            debutTopK = time.time()
             conn = connect()
             cur1 = conn.cursor()
             cur2 = conn.cursor()
@@ -646,6 +660,8 @@ def index_global_MD():
 
 
             conn.commit()
+            tmpTopK = time.time() - debutTopK
+            flash(tmpTopK)
             return render_template('index_global_MD_confirm.html', active="index_global_MD")
         return render_template('index_global_MD.html', active="index_global_MD")
     else:

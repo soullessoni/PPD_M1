@@ -1,6 +1,10 @@
 {% extends "container.html" %}
 {% block body %}
+     {% for message in get_flashed_messages() %}
+         Temps d'exécution : {{ message }} secondes<br><br>
+     {% endfor %}
+     La liste des résultats :<br><br>
      {% for t in res %}
         {{ t }} <br>
-    {% endfor %}
+     {% endfor %}
 {% endblock %}

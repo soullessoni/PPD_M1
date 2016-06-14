@@ -1,5 +1,8 @@
 {% extends "container.html" %}
 {% block body %}
+    {% for message in get_flashed_messages() %}
+         Temps d'exécution : {{ message }} secondes<br><br>
+    {% endfor %}
     <div>
         Les index locaux sont à jour !
     </div>
