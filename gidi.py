@@ -49,6 +49,7 @@ def drop_index_local():
         conn.commit()
 
 
+
 @app.route('/')
 def home():
     return render_template('home.html')
@@ -516,8 +517,6 @@ def threshold():
     else:
         return redirect(url_for('error'))
 
-
-
 @app.route('/index_global_MD', methods=['GET', 'POST'])
 def index_global_MD():
     if session.get('connexion'):
@@ -667,12 +666,11 @@ def index_global_MD():
     else:
         return redirect(url_for('error'))
 
-
 @app.route('/error')
 def error():
     return render_template("db_error.html")
 
-app.secret_key = '6Mb0JgsZ4HLJpnbSjNiZuTwaSA7RwV3Inf6DUmnu'
+app.secret_key = '7vNivdefmjkPOz3kUG7aaErD0Z2lPd1G'
 
 if __name__ == '__main__':
     app.run()
